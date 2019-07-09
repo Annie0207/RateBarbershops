@@ -1,0 +1,31 @@
+<% include ../partials/header %>
+   
+     <!--class的内容来自bootstrap的类型；jumbotron是一种格式-->
+    <header class="jumbotron">
+        <div class="container">
+             <h1><span class="glyphicon glyphicon-tent"></span> Welcome To RateBarber!</h1>
+            <p>View our hand-picked barbershops for all over the U.S.</p>
+            <p>
+                <a class="btn btn-primary bth-lg" href="/barbershops/new">Add New Barbershop</a>
+            </p>
+        </div>
+    </header>
+    
+    <div class="row text-center" style="display:flex; flex-wrap:wrap;">
+        <% barbershops.forEach(function(barbershop){ %>
+            <div class="col-md-3 col-sm-6">
+                <div class="thumbnail">
+                    <img src="<%= barbershop.image %>">
+                    <div class="caption">
+                         <h4><%= barbershop.name %></h4>
+                    </div>
+                    <p>
+                        <a href="/barbershops/<%= barbershop._id %>" class="btn btn-primary">More Info</a>
+                    </p>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+
+
+<% include ../partials/footer %>
