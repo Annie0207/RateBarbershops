@@ -5,6 +5,7 @@ var Comment = require("../models/comment");
 //require default include the index.js file
 var middleware = require("../middleware");
 var geocoder = require('geocoder');
+var { isLoggedIn, checkUserBarbershop, checkUserComment, isAdmin } = middleware; 
 
 //INDEX ROUTE -- show all barbershops
 router.get("/", function(req, res){
@@ -18,13 +19,13 @@ router.get("/", function(req, res){
 });
 
 //NEW ROUTE -- show form to create new barbershop
-router.get("/new",middleware.isLoggedIn, function(req, res) {
+router.get("/new", isLoggedIn, function(req, res) {
     res.render("barbershops/new");
 });
 
 // CREATE ROUTE -- add new barbershop to DB
 // same url with different methods is identified as different routes: the post route will get the sumbit form
-router.post("/", middleware.isLoggedIn, function(req, res){
+router.post("/", isLoggedIn, function(req, res){
     var name = req.body.name;
     var price = req.body.price;
     var image = req.body.image;
@@ -69,14 +70,12 @@ router.get("/:id", function(req, res){
 });
 
 //EDIT barbershop ROUTE
-router.get("/:id/edit", middleware.checkBarbershopOwnership, function(req, res) {
-   Barbershop.findById(req.params.id, function(err, foundBarbershop){
-        res.render("barbershops/edit", {barbershop: foundBarbershop});
-    });
+router.get("/:id/edit", isLoggedIn, checkUserBarbershop, function(req, res) {
+  res.render("barbershops/edit", {barbershop: req.barbershop});
 });
 
 //UPDATE barbershop ROUTE
-router.put("/:id", middleware.checkBarbershopOwnership, function(req, res){
+router.put("/:id", function(req, res){
 	geocoder.geocode(req.body.location, function (err, data) {
 		var lat = data.results[0].geometry.location.lat;
 		var lng = data.results[0].geometry.location.lng;
@@ -95,7 +94,7 @@ router.put("/:id", middleware.checkBarbershopOwnership, function(req, res){
 });
 
 //DESTROY barbershop and its comments ROUTE
-router.delete("/:id", middleware.checkBarbershopOwnership, function(req, res){
+router.delete("/:id", isLoggedIn, checkUserBarbershop, function(req, res){
 	Comment.remove({
 		_id: {
 			$in: req.barbershop.comments

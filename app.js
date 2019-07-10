@@ -16,7 +16,7 @@ var express        = require("express"),
 
 //requireing Routes 
 var commentRoutes       = require("./routes/comments"),
-    barbershopsRoutes   = require("./routes/barbershops"),
+    barbershopRoutes   = require("./routes/barbershops"),
     indexRoutes         = require("./routes/index");
 
 // assign mongoose promise library and connect to database
@@ -65,7 +65,7 @@ app.use("/", indexRoutes);
 app.use("/barbershops", barbershopRoutes);
 app.use("/barbershops/:id/comments", commentRoutes);
 
-
-app.listen(process.env.PORT, process.env.IP, function(){
+// process.env.PORT
+app.listen(3000, process.env.IP, function(){
     console.log("The RateBarber Server Has Started!");
 });

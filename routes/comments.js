@@ -1,13 +1,14 @@
 //COMMENT ROUTE
-var express = require("express");
+const express = require("express");
 //merge all request params
-var router = express.Router({mergeParams: true});
-var Barbershop = require("../models/barbershop");
-var Comment = require("../models/comment");
-var middleware = require("../middleware");
+const router = express.Router({mergeParams: true});
+const Barbershop = require("../models/barbershop");
+const Comment = require("../models/comment");
+const middleware = require("../middleware");
+const { isLoggedIn, checkUserComment, isAdmin } = middleware;
 
 //Comment New
-router.get("/new", middleware.isLoggedIn, function(req, res){
+router.get("/new", isLoggedIn, function(req, res){
     //find barbershop by id, and then render the new form page
     Barbershop.findById(req.params.id, function(err, barbershop){
         if(err){
@@ -19,7 +20,7 @@ router.get("/new", middleware.isLoggedIn, function(req, res){
 });
 
 //Comment Create
-router.post("/", middleware.isLoggedIn, function(req, res){
+router.post("/", isLoggedIn, function(req, res){
     Barbershop.findById(req.params.id, function(err, barbershop) {
         if(err){
             console.log(err);
@@ -47,12 +48,12 @@ router.post("/", middleware.isLoggedIn, function(req, res){
 });
 
 //Comment edit
-router.get("/:comment_id/edit", middleware.checkCommentOwnership, function(req, res){
+router.get("/:comment_id/edit", isLoggedIn, checkUserComment, function(req, res){
    res.render("comments/edit", {campground_id: req.params.id, comment: req.comment});
 });
 
 //Comment update
-router.put("/:comment_id", middleware.checkCommentOwnership, function(req, res){
+router.put("/:comment_id", isAdmin, function(req, res){
 	 Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, function(err, comment){
        if(err){
           console.log(err);
@@ -65,7 +66,7 @@ router.put("/:comment_id", middleware.checkCommentOwnership, function(req, res){
 
 
 //Comment delete
-router.delete("/:comment_id", middleware.checkCommentOwnership, function(req, res){
+router.delete("/:comment_id", isLoggedIn, checkUserComment, function(req, res){
     Barbershop.findByIdAndRemove(req.params.id, {
 		$pull: {
 			comments: req.comment.id

@@ -17,13 +17,16 @@ router.get("/register", function(req, res){
 //handle sign up logic
 router.post("/register", function(req, res){
     var newUser = new User({username: req.body.username});
+	if(req.body.adminCode === process.env.ADMIN_CODE) {
+      newUser.isAdmin = true;
+    }
     User.register(newUser, req.body.password, function(err, user){
         if(err){
             req.flash("error", err.message);
             return res.render("register");
         }
         passport.authenticate("local")(req, res, function(){
-           req.flash("success", "Welcome to RateBarber " + user.username);
+           req.flash("success", "Successfully Signed Up! Nice to meet you " + req.body.username);
            res.redirect("/barbershops"); 
         });
     });
@@ -34,14 +37,14 @@ router.get("/login", function(req, res){
     res.render("login", {page: 'login'});
 });
 
-//handle login logic
+//handling login logic
 router.post("/login", passport.authenticate("local", 
     {
-        successRedirect:"/barbershops",
-        failureRedirect:"/login",
-	    failureFlash: true,
+        successRedirect: "/barbershops",
+        failureRedirect: "/login",
+        failureFlash: true,
         successFlash: 'Welcome to RateBarber!'
-    }), function(req, res) {
+    }), function(req, res){
 });
 
 //logout route
